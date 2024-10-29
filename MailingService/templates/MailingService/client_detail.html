@@ -1,0 +1,15 @@
+{% extends 'MailingSrvice/base.html' %}
+
+{% block title%} Детали статьи {% endblock %}
+
+{% block content %}
+{% include 'MailingSrvice/header.html' %}
+<h2>{{ client.full_name | title }}</h2>
+<p>Email: {{ client.email | date:"d.m.Y" }} </p>
+<p>Комментарий: {{ client.comment }} </p>
+
+<a href="{% url 'MailingService:client_update' article.pk %}" class="btn btn-secondary">Редактировать</a>
+<a href="{% url 'MailingService:client_delete' article.pk %}" class="btn btn-danger">Удалить</a>
+<a href="{% url 'MailingService:client_list' %}" class="btn btn-primary">Список клиентов</a>
+
+{% endblock %}

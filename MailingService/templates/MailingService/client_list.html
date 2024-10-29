@@ -1,0 +1,17 @@
+{% extends 'MailingSrvice/base.html' %}
+
+{% block title%} Список статей {% endblock %}
+
+{% block content %}
+{% include 'MailingSrvice/header.html' %}
+<h2 class="mt-4">Список книг</h2>
+    <ul class="list-group mb-5">
+        {% for client in clients %}
+            <li class="list-group-item mr-4">
+                <a href="{% url 'blog:article_detail' article.pk %}">{{ client.full_name | title }}</a> | {{ client.email }}
+<!--                <p>Просмотров - {{ article.views_counter }}</p>-->
+            </li>
+        {% endfor %}
+
+    </ul>
+{% endblock %}
