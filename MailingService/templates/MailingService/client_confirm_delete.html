@@ -1,11 +1,11 @@
-{% extends 'MailingSrvice/base.html' %}
+{% extends 'MailingService/base.html' %}
 
-{% block title%} Удаление статьи {% endblock %}
+{% block title%} Удаление клиента {% endblock %}
 
 {% block content %}
-{% include 'MailingSrvice/header.html' %}
+{% include 'MailingService/header.html' %}
 <h2>Удаление статьи</h2>
-<p>Вы действительно хотите удалить "{{client.title}}"?</p>
+<p>Вы действительно хотите удалить "{{client.full_name}}"?</p>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

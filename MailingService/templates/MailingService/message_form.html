@@ -1,0 +1,15 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Форма для статьи {% endblock %}
+
+{% block content %}
+{% include 'MailingService/header_messages.html' %}
+<h2>Форма для сообщения</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'MailingService:messages_list' %}" class="btn btn-warning">Отменить</a>
+</form>
+
+{% endblock %}

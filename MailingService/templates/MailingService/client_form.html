@@ -1,10 +1,10 @@
-{% extends 'MailingSrvice/base.html' %}
+{% extends 'MailingService/base.html' %}
 
-{% block title%} Форма для статьи {% endblock %}
+{% block title%} Форма для клиента {% endblock %}
 
 {% block content %}
-{% include 'MailingSrvice/header.html' %}
-<h2>Форма для книги</h2>
+{% include 'MailingService/header.html' %}
+<h2>Форма для клиента</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

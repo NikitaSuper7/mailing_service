@@ -51,7 +51,8 @@ class Mailing(models.Model):
         (LAUNCH_STATEMENT, 'Запущена'),
         (COMPLETE_STATEMENT, 'Завершена'),
     ]
-
+    name = models.CharField(max_length=200, verbose_name='Название рассылки', help_text='Введите название рассылки',
+                            null=True)
     client = models.ManyToManyField(Client, verbose_name='Клиент')
     massage = models.ForeignKey(Massage, on_delete=models.CASCADE, verbose_name='Сообщение')
     message_states = models.CharField(max_length=10, choices=STATE_CHOICES, default=CREATE_STATEMENT)

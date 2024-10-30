@@ -1,0 +1,16 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Удаление сообщения {% endblock %}
+
+{% block content %}
+{% include 'MailingService/header_messages.html' %}
+<h2>Удаление сообщения</h2>
+<p>Вы действительно хотите удалить "{{message.topic}}"?</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-danger">Подтвердить</button>
+    <a href="{% url 'MailingService:messages_list' %}" class="btn btn-warning">Отменить</a>
+</form>
+
+{% endblock %}

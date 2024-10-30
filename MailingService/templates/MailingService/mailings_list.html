@@ -1,0 +1,17 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Список рассылок {% endblock %}
+
+{% block content %}
+{% include 'MailingService/header_mailings.html' %}
+<h2 class="mt-4">Список рассылок</h2>
+    <ul class="list-group mb-5">
+        {% for mailing in mailings %}
+            <li class="list-group-item mr-4">
+                <a href="{% url 'MailingService:mailing_detail' mailing.pk %}">{{ mailing.message_states | title }}</a>
+<!--                <p>Просмотров - {{ article.views_counter }}</p>-->
+            </li>
+        {% endfor %}
+
+    </ul>
+{% endblock %}

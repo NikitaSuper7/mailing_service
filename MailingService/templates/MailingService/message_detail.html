@@ -1,0 +1,15 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Детали сообщения {% endblock %}
+
+{% block content %}
+{% include 'MailingService/header_messages.html' %}
+<!--<h2>{{ message.topic | title }}</h2>-->
+<h4>Тема: {{ message.topic | title}} </h4>
+<p>Текст: {{ message.body }} </p>
+
+<a href="{% url 'MailingService:message_update' message.pk %}" class="btn btn-secondary">Редактировать</a>
+<a href="{% url 'MailingService:message_delete' message.pk %}" class="btn btn-danger">Удалить</a>
+<a href="{% url 'MailingService:messages_list' %}" class="btn btn-primary">Список сообщений</a>
+
+{% endblock %}
