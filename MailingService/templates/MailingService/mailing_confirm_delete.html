@@ -1,0 +1,16 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Удаление рассылки {% endblock %}
+
+{% block content %}
+{% include 'MailingService/header_mailings.html' %}
+<h2>Удаление статьи</h2>
+<p>Вы действительно хотите удалить "{{mailing.name}}"?</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-danger">Подтвердить</button>
+    <a href="{% url 'MailingService:mailings_list' %}" class="btn btn-warning">Отменить</a>
+</form>
+
+{% endblock %}

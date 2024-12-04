@@ -23,7 +23,19 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'MailingService:mailings_list' %}">Рассылки</a>
                 </li>
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'users:logout' %}" style="display: inline">
+                        {% csrf_token %}
+                      <button class="btn btn-link nav-link" type="submit" aria-expanded="false">
+                        Выход
+                      </button>
 
+                    </form>
+                    {% else %}
+                        <li><a class="nav-link" href="{% url 'users:login' %}">Вход</a></li>
+                        <li><a class="nav-link" href="{% url 'users:register' %}">Регистрация</a></li>
+
+                    {% endif %}
             </ul>
 
         </div>

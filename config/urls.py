@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('MailingService/', include('MailingService.urls', namespace='MailingService')),
+    path('users/', include('users.urls', namespace='users')),
 ]
 
 if settings.DEBUG:

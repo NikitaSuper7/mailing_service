@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import CustomUser
 
 
 # Create your models here.
@@ -13,6 +14,13 @@ class Client(models.Model):
         blank=True,
         null=True,
     )
+    owner = models.ForeignKey(CustomUser,
+                              blank=True,
+                              null=True,
+                              on_delete=models.CASCADE,
+                              max_length=150,
+                              verbose_name="Владелец рассылки",
+                              help_text='Owner')
 
     def __str__(self):
         return f"{self.full_name}, email -{self.email}"
@@ -31,6 +39,13 @@ class Massage(models.Model):
         blank=True,
         null=True,
     )
+    owner = models.ForeignKey(CustomUser,
+                              blank=True,
+                              null=True,
+                              on_delete=models.CASCADE,
+                              max_length=150,
+                              verbose_name="Владелец рассылки",
+                              help_text='Owner')
 
     def __str__(self):
         return f'{self.topic}, {self.body}'
@@ -56,9 +71,16 @@ class Mailing(models.Model):
     client = models.ManyToManyField(Client, verbose_name='Клиент')
     massage = models.ForeignKey(Massage, on_delete=models.CASCADE, verbose_name='Сообщение')
     message_states = models.CharField(max_length=10, choices=STATE_CHOICES, default=CREATE_STATEMENT)
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
-    sent_at = models.DateTimeField(null=True, verbose_name='Дата и время начала отправки')
-    end_send_at = models.DateTimeField(null=True, verbose_name='Дата и время окончания отправки')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания', null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата и время начала отправки')
+    end_send_at = models.DateTimeField(null=True, blank=True, verbose_name='Дата и время окончания отправки')
+    owner = models.ForeignKey(CustomUser,
+                              blank=True,
+                              null=True,
+                              on_delete=models.CASCADE,
+                              max_length=150,
+                              verbose_name="Владелец рассылки",
+                              help_text='Owner')
 
     def __str__(self):
         return f'{self.massage} {self.created_at}'

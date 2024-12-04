@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     # MY apps
     'MailingService',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,20 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Кастомная модель пользователя
+AUTH_USER_MODEL = 'users.CustomUser'
+# Переменная для перенаправления пользователей после login на сайте
+LOGIN_REDIRECT_URL = 'MailingService:main_page'
+# Переменная для перенаправления пользователя, если он не зарегестрирован и пытается получить доступ к ограниченному функционалу.
+LOGIN_URL = 'users:login'
+
+# Для EMAIL
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_USE_TLS = True if os.getenv('EMAIL_USE_TLS') == 'True' else False
+EMAIL_USE_SSL = True if os.getenv('EMAIL_USE_SSL') == 'True' else False
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

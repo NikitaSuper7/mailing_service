@@ -1,0 +1,28 @@
+{% extends 'MailingService/base.html' %}
+{% block title%} Регистрация {% endblock %}
+
+{% block content %}
+<main class="row m-3">
+    <h3>Добро пожаловать в онлайн магазин</h3>
+
+        <div class="row text">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="row m-2">Введите данные для регистрации:</h5>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                                <a href="{% url 'users:login' %}" class="btn btn-secondary">Вход</a>
+                            </form>
+
+                      </div>
+                    </div>
+                </div>
+        </div>
+</main>
+
+
+{% endblock %}

@@ -3,10 +3,11 @@
 {% block title%} Детали сообщения {% endblock %}
 
 {% block content %}
-{% include 'MailingService/header_messages.html' %}
-<!--<h2>{{ message.topic | title }}</h2>-->
+{% include 'MailingService/header_mailings.html' %}
+
 <h4>Название: {{ mailing.name | title}} </h4>
-<p>Клиенты: {{ mailing.client }} </p>
+<!--<p>Клиенты: {{ mailing.client.name }} </p>-->
+<p>Кол-во клиентов: {{ clients }} </p>
 
 <a href="{% url 'MailingService:mailing_update' mailing.pk %}" class="btn btn-secondary">Редактировать</a>
 <a href="{% url 'MailingService:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
