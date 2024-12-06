@@ -141,7 +141,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Кастомная модель пользователя
 AUTH_USER_MODEL = 'users.CustomUser'
 # Переменная для перенаправления пользователей после login на сайте
-LOGIN_REDIRECT_URL = 'MailingService:main_page'
+LOGIN_REDIRECT_URL = 'MailingService:mailings_list'
 # Переменная для перенаправления пользователя, если он не зарегестрирован и пытается получить доступ к ограниченному функционалу.
 LOGIN_URL = 'users:login'
 

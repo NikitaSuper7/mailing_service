@@ -9,20 +9,21 @@ from django.core.mail import send_mail
 from .forms import MailingForm
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 # Create your views here.
 
 # Контроллеры клиента
 
-class ClientListView(ListView):
+class ClientListView(LoginRequiredMixin, ListView):
     """List of client"""
     model = Client
     template_name = 'MailingService/client_list.html'
     context_object_name = 'clients'
 
 
-class ClientCreateView(CreateView):
+class ClientCreateView(LoginRequiredMixin, CreateView):
     """Create a new client"""
     model = Client
     fields = ['full_name', 'email', 'comment']
@@ -37,14 +38,14 @@ class ClientCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ClientDetailView(DetailView):
+class ClientDetailView(LoginRequiredMixin, DetailView):
     """Client detail view"""
     model = Client
     template_name = 'MailingService/client_detail.html'
     context_object_name = 'client'
 
 
-class ClientUpdateView(UpdateView):
+class ClientUpdateView(LoginRequiredMixin, UpdateView):
     """Client update view"""
     model = Client
     fields = ['full_name', 'email', 'comment']
@@ -59,7 +60,7 @@ class ClientUpdateView(UpdateView):
         raise PermissionDenied
 
 
-class ClientDeleteView(DeleteView):
+class ClientDeleteView(LoginRequiredMixin, DeleteView):
     """Client delete view"""
     model = Client
     template_name = 'MailingService/client_confirm_delete.html'
@@ -82,14 +83,14 @@ class ClientDeleteView(DeleteView):
 
 # Контроллеры сообщения:
 
-class MessageListView(ListView):
+class MessageListView(LoginRequiredMixin, ListView):
     """Massage list view"""
     model = Massage
     template_name = 'MailingService/messages_list.html'
     context_object_name = 'messages'
 
 
-class MessageCreateView(CreateView):
+class MessageCreateView(LoginRequiredMixin, CreateView):
     """Massage create view"""
     model = Massage
     fields = ['topic', 'body']
@@ -104,14 +105,14 @@ class MessageCreateView(CreateView):
         return super().form_valid(form)
 
 
-class MessageDetailView(DetailView):
+class MessageDetailView(LoginRequiredMixin, DetailView):
     """Massage detail view"""
     model = Massage
     template_name = 'MailingService/message_detail.html'
     context_object_name = 'message'
 
 
-class MessageUpdateView(UpdateView):
+class MessageUpdateView(LoginRequiredMixin, UpdateView):
     """Massage update view"""
     model = Massage
     fields = ['topic', 'body']
@@ -126,7 +127,7 @@ class MessageUpdateView(UpdateView):
         raise PermissionDenied
 
 
-class MessageDeleteView(DeleteView):
+class MessageDeleteView(LoginRequiredMixin, DeleteView):
     """Massage delete view"""
     model = Massage
     template_name = 'MailingService/message_confirm_delete.html'
@@ -145,14 +146,14 @@ class MessageDeleteView(DeleteView):
 
 
 # Контроллеры для рассылки
-class MailingListView(ListView):
+class MailingListView(LoginRequiredMixin, ListView):
     """Mailing list view"""
     model = Mailing
     template_name = 'MailingService/mailings_list.html'
     context_object_name = 'mailings'
 
 
-class MailingCreateView(CreateView):
+class MailingCreateView(LoginRequiredMixin, CreateView):
     """Mailing create view"""
     model = Mailing
     form_class = MailingForm
@@ -187,7 +188,7 @@ class MailingCreateView(CreateView):
         return super().form_valid(form)
 
 
-class MailingDetailView(DetailView):
+class MailingDetailView(LoginRequiredMixin, DetailView):
     """Mailing detail view"""
     model = Mailing
     template_name = 'MailingService/mailing_detail.html'
@@ -199,7 +200,7 @@ class MailingDetailView(DetailView):
         return context
 
 
-class MailingUpdateView(UpdateView):
+class MailingUpdateView(LoginRequiredMixin, UpdateView):
     """Mailing update view"""
     model = Mailing
     form_class = MailingForm
@@ -239,7 +240,7 @@ class MailingUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class MailingDeleteView(DeleteView):
+class MailingDeleteView(LoginRequiredMixin, DeleteView):
     """Mailing delete view"""
     model = Mailing
     template_name = "MailingService/mailing_confirm_delete.html"

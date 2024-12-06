@@ -89,3 +89,6 @@ class Mailing(models.Model):
         verbose_name = 'Рассылка'
         verbose_name_plural = 'Рассылки'
         ordering = ['created_at', 'sent_at']
+        permissions = [
+            ("can_view_mailing", "Can view mailing"),
+        ]

@@ -2,6 +2,8 @@
     <h2>Клиенты</h2>
     <nav>
         <a href="{% url 'MailingService:client_list' %}">Список клиентов</a>
+        {% if user.is_authenticated %}
         <a href="{% url 'MailingService:client_form' %}">Добавить клиента</a>
+        {% endif %}
     </nav>
 </header>

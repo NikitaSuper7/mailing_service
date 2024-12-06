@@ -2,6 +2,8 @@
     <h2>Сообщения</h2>
     <nav>
         <a href="{% url 'MailingService:messages_list' %}">Список сообщений</a>
+        {% if user.is_authenticated %}
         <a href="{% url 'MailingService:message_form' %}">Добавить сообщение</a>
+        {% endif %}
     </nav>
 </header>

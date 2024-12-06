@@ -7,10 +7,12 @@
 <h2 class="mt-4">Список клиентов</h2>
     <ul class="list-group mb-5">
         {% for client in clients %}
+        {% if user == client.owner %}
             <li class="list-group-item mr-4">
                 <a href="{% url 'MailingService:client_detail' client.pk %}">{{ client.full_name | title }}</a> | {{ client.email }}
 <!--                <p>Просмотров - {{ article.views_counter }}</p>-->
             </li>
+        {% endif %}
         {% endfor %}
 
     </ul>
