@@ -145,6 +145,14 @@ LOGIN_REDIRECT_URL = 'MailingService:mailings_list'
 # Переменная для перенаправления пользователя, если он не зарегестрирован и пытается получить доступ к ограниченному функционалу.
 LOGIN_URL = 'users:login'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # формат значения - 'redis://номер хоста:номер порта/номер БД'
+    }
+}
+
+
 # Для EMAIL
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_HOST = os.getenv('EMAIL_HOST')

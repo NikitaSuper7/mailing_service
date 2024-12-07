@@ -11,13 +11,20 @@ from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 import smtplib
-from users.models import CustomUser
+
+# Для кеширования страниц:
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
+# Для низкоуровневого кеширования:
+from django.core.cache import cache
 
 
 # Create your views here.
 
 # Контроллеры клиента
 
+@method_decorator(cache_page(16 * 15), name='dispatch')
 class ClientListView(LoginRequiredMixin, ListView):
     """List of client"""
     model = Client
@@ -39,7 +46,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         client.save()
         return super().form_valid(form)
 
-
+@method_decorator(cache_page(16 * 15), name='dispatch')
 class ClientDetailView(LoginRequiredMixin, DetailView):
     """Client detail view"""
     model = Client
@@ -84,7 +91,7 @@ class ClientDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # Контроллеры сообщения:
-
+@method_decorator(cache_page(16 * 15), name='dispatch')
 class MessageListView(LoginRequiredMixin, ListView):
     """Massage list view"""
     model = Massage
@@ -106,7 +113,7 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         message.save()
         return super().form_valid(form)
 
-
+@method_decorator(cache_page(16 * 15), name='dispatch')
 class MessageDetailView(LoginRequiredMixin, DetailView):
     """Massage detail view"""
     model = Massage
@@ -148,18 +155,26 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # Контроллеры для рассылки
+# @method_decorator(cache_page(16 * 5), name='dispatch')
 class MailingListView(LoginRequiredMixin, ListView):
     """Mailing list view"""
     model = Mailing
     template_name = 'MailingService/mailings_list.html'
     context_object_name = 'mailings'
 
-
+# @method_decorator(cache_page(16 * 5), name='dispatch')
 class MainListView(LoginRequiredMixin, ListView):
     """Mailing list view"""
     model = Mailing
     template_name = 'MailingService/main_page.html'
     context_object_name = 'mailings'
+
+    def get_queryset(self):
+        queryset = cache.get('report_queryset')
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set('report_queryset', queryset, 60*5)
+        return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -173,11 +188,20 @@ class MainListView(LoginRequiredMixin, ListView):
         # print(clients)
         return context
 
+# @method_decorator(cache_page(16 * 15), name='dispatch')
 class ReportListView(LoginRequiredMixin, ListView):
     """Mailing list view"""
     model = Mailing
     template_name = 'MailingService/reports.html'
     context_object_name = 'mailings'
+
+    def get_queryset(self):
+        queryset = cache.get('mailing_queryset')
+
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set('mailing_queryset', queryset, 60 * 5)
+        return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -230,6 +254,7 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+@method_decorator(cache_page(16 * 15), name='dispatch')
 class MailingDetailView(LoginRequiredMixin, DetailView):
     """Mailing detail view"""
     model = Mailing
