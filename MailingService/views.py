@@ -217,7 +217,7 @@ class ReportListView(LoginRequiredMixin, ListView):
 
 
 class MailingCreateView(LoginRequiredMixin, CreateView):
-    """Mailing create view"""
+    """Mailing create view."""
     model = Mailing
     form_class = MailingForm
     # fields = ['name', 'client', 'massage']
