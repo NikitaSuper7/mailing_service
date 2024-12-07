@@ -12,7 +12,7 @@
 {% if user == mailing.owner %}
 <a href="{% url 'MailingService:mailing_update' mailing.pk %}" class="btn btn-secondary">Редактировать</a>
 <a href="{% url 'MailingService:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
-{% end if %}
+{% endif %}
 <a href="{% url 'MailingService:mailings_list' %}" class="btn btn-primary">Список рассылок</a>
 
 {% endblock %}

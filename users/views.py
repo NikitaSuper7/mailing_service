@@ -1,7 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic.edit import CreateView
+from django.views.generic import DetailView
+from django.views.generic.edit import CreateView, UpdateView
 from .forms import CustomUserCreationForm
 from django.core.mail import send_mail
 from users.models import CustomUser
@@ -47,3 +50,23 @@ def email_verification(request, token):
     user.is_active = True
     user.save()
     return redirect(reverse('users:login'))
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    """Client detail view"""
+    model = CustomUser
+    template_name = 'users/user_detail.html'
+    context_object_name = 'current_user'
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    """Client update view"""
+    model = CustomUser
+    fields = ['email', 'username', 'phone_number', 'avatar']
+    template_name = 'users/user_form.html'
+    success_url = reverse_lazy('MailingService:main_page')
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.request.user == self.object:
+            self.object.save()
+            return self.object
+        raise PermissionDenied
+

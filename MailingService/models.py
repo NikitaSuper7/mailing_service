@@ -92,3 +92,20 @@ class Mailing(models.Model):
         permissions = [
             ("can_view_mailing", "Can view mailing"),
         ]
+
+class Attemts(models.Model):
+    """Модель попытки рассылки"""
+
+    datetime = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время попытки")
+    state = models.CharField(max_length=15, verbose_name="Статус")
+    server_response = models.TextField(verbose_name="Ответ почтового сервера")
+    mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, verbose_name="Рассылка")
+
+    def __str__(self):
+        return f'{self.mailing} {self.datetime}'
+
+    class Meta:
+        verbose_name = 'Попытка'
+        verbose_name_plural = 'Попытки'
+        ordering = ['datetime', 'mailing']
+

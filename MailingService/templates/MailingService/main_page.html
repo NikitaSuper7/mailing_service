@@ -1,0 +1,47 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Список рассылок {% endblock %}
+
+{% block content %}
+<!--{% include 'MailingService/header_mailings.html' %}-->
+<h3 class="m-4">Статистика ваших рассылок:</h3>
+    <ul class="list-group m-4">
+        <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Сегмент рассылок</th>
+                  <th scope="col">Количество</th>
+                </tr>
+              </thead>
+            <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Создано (не активных)</td>
+                  <td>{{ mailings_active }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Активных</td>
+                  <td>{{ mailings_active }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td>Завершенные</td>
+                  <td>{{ mailings_completed }}</td>
+                </tr>
+                <tr>
+                  <th scope="row" >4</th>
+                  <td class="fw-bold">Всего рассылок</td>
+                  <td class="fw-bold">{{ mailings_total }}</td>
+                </tr>
+                <tr>
+                  <th scope="row" >5</th>
+                  <td class="fw-bold">Всего клиентов</td>
+                  <td class="fw-bold">{{ uniq_clients }}</td>
+                </tr>
+              </tbody>
+        </table>
+
+    </ul>
+{% endblock %}

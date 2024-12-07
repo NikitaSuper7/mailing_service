@@ -6,3 +6,4 @@ from users.models import CustomUser
 @admin.register(CustomUser)
 class CatalogAdmin(admin.ModelAdmin):
     exclude = ('password',)
+    list_display = ("id", "username", "email", "phone_number", "avatar")

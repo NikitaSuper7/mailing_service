@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from MailingService.models import Client, Mailing, Massage
+from MailingService.models import Client, Mailing, Massage, Attemts
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -10,6 +10,8 @@ from .forms import MailingForm
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+import smtplib
+from users.models import CustomUser
 
 
 # Create your views here.
@@ -153,6 +155,43 @@ class MailingListView(LoginRequiredMixin, ListView):
     context_object_name = 'mailings'
 
 
+class MainListView(LoginRequiredMixin, ListView):
+    """Mailing list view"""
+    model = Mailing
+    template_name = 'MailingService/main_page.html'
+    context_object_name = 'mailings'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mailings = self.model.objects.filter(owner=self.request.user)
+        mailings_ids = [mailing.id for mailing in mailings]
+        context['uniq_clients'] = Client.objects.filter(mailing__id__in=mailings_ids).distinct().count()
+        context['mailings_total'] = self.model.objects.filter(owner=self.request.user).count()
+        context['mailings_active'] = self.model.objects.filter(owner=self.request.user, message_states="Launched").count()
+        context['mailings_completed'] = self.model.objects.filter(owner=self.request.user,
+                                                               message_states="Compleated").count()
+        # print(clients)
+        return context
+
+class ReportListView(LoginRequiredMixin, ListView):
+    """Mailing list view"""
+    model = Mailing
+    template_name = 'MailingService/reports.html'
+    context_object_name = 'mailings'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mailings = self.model.objects.filter(owner=self.request.user)
+        mailings_ids = [mailing.id for mailing in mailings]
+        context['total_attempts'] = Attemts.objects.filter(mailing__id__in=mailings_ids).count()
+        context['success_attempts'] = Attemts.objects.filter(mailing__id__in=mailings_ids, state="Успешно").count()
+        context['failed_attempts'] = Attemts.objects.filter(mailing__id__in=mailings_ids, state="Ошибка").count()
+
+        return context
+
+
+
+
 class MailingCreateView(LoginRequiredMixin, CreateView):
     """Mailing create view"""
     model = Mailing
@@ -166,25 +205,28 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
         user = self.request.user
         mailing.owner = user
         mailing.save()
-        host = self.request.get_host()
-        # url = f"http://{host}/users/mailing-email/"
-        subject = mailing.massage.topic
-        message = f"""{mailing.massage.body}"""
-
-        from_email = EMAIL_HOST_USER
-        # for client in mailing.client.all():
-        #     print(f"Клиенты {client.email}")
         recipient_list = [client.email for client in mailing.client.all()]
-        print(f"Отправляем письма на {recipient_list}")
-        if mailing.message_states == mailing.LAUNCH_STATEMENT:
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=from_email,
-                recipient_list=recipient_list
-            )
+        # print(f"Отправляем письма на {recipient_list}")
+        try:
+            if mailing.message_states == mailing.LAUNCH_STATEMENT:
+                server_response = send_mail(
+                    subject=mailing.massage.topic,
+                    message=mailing.massage.body,
+                    from_email=EMAIL_HOST_USER,
+                    recipient_list=recipient_list,
+                    fail_silently=False,
+                )
+                attemt = Attemts.objects.create(mailing=mailing, server_response=server_response)
+                if server_response:
+                    attemt.state = "Успешно"
+                    mailing.message_states = mailing.COMPLETE_STATEMENT
+                    #     mailing.sent_at = datetime.now().date()
+                attemt.save()
+
+        except smtplib.SMTPException as exception:
+            Attemts.objects.create(mailing=mailing, server_response=exception, state="Ошибка")
             mailing.message_states = mailing.COMPLETE_STATEMENT
-            mailing.sent_at = datetime.now().date()
+
         return super().form_valid(form)
 
 
@@ -227,16 +269,36 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
         # for client in mailing.client.all():
         #     print(f"Клиенты {client.email}")
         recipient_list = [client.email for client in mailing.client.all()]
-        print(f"Отправляем письма на {recipient_list}")
-        if mailing.message_states == mailing.LAUNCH_STATEMENT:
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=from_email,
-                recipient_list=recipient_list
-            )
+        try:
+            if mailing.message_states == mailing.LAUNCH_STATEMENT:
+                server_response = send_mail(
+                    subject=mailing.massage.topic,
+                    message=mailing.massage.body,
+                    from_email=EMAIL_HOST_USER,
+                    recipient_list=recipient_list,
+                    fail_silently=False,
+                )
+                attemt = Attemts.objects.create(mailing=mailing, server_response=server_response)
+                if server_response:
+                    attemt.state = "Успешно"
+                    mailing.message_states = mailing.COMPLETE_STATEMENT
+                    #     mailing.sent_at = datetime.now().date()
+                attemt.save()
+
+        except smtplib.SMTPException as exception:
+            Attemts.objects.create(mailing=mailing, server_response=exception, state="Ошибка")
             mailing.message_states = mailing.COMPLETE_STATEMENT
-            mailing.sent_at = datetime.now().date()
+
+        # if mailing.message_states == mailing.LAUNCH_STATEMENT:
+        #     send_mail(
+        #         subject=subject,
+        #         message=message,
+        #         from_email=from_email,
+        #         recipient_list=recipient_list
+        #     )
+        #     mailing.message_states = mailing.COMPLETE_STATEMENT
+        #     mailing.sent_at = datetime.now().date()
+
         return super().form_valid(form)
 
 
@@ -254,3 +316,5 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
         if mailing.owner == user:
             return mailing
         raise PermissionDenied("У вас нет прав на удаление этой рассылки.")
+
+

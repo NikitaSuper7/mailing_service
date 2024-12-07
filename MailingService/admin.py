@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, Mailing, Massage
+from .models import Client, Mailing, Massage, Attemts
 # Register your models here.
 
 @admin.register(Client)
@@ -19,3 +19,9 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ("id", "topic", "body", )
     list_filter = ("topic",)
     search_fields = ("topic", "body",)
+
+@admin.register(Attemts)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("id", "datetime", "state", "server_response", "mailing",)
+    list_filter = ("datetime", "state", "mailing",)
+    search_fields = ("datetime", "state", "mailing", "server_response",)

@@ -7,7 +7,7 @@
 <h2 class="mt-4">Список сообщений</h2>
     <ul class="list-group mb-5">
         {% for message in messages %}
-        {% if user message.owner %}
+        {% if user == message.owner %}
             <li class="list-group-item mr-4">
                 <a href="{% url 'MailingService:message_detail' message.pk %}">{{ message.topic | title }}</a>
 <!--                <p>Просмотров - {{ article.views_counter }}</p>-->

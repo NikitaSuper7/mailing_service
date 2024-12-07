@@ -1,0 +1,37 @@
+{% extends 'MailingService/base.html' %}
+
+{% block title%} Список рассылок {% endblock %}
+
+{% block content %}
+<!--{% include 'MailingService/header_mailings.html' %}-->
+<h3 class="m-4">Статистика попыток:</h3>
+    <ul class="list-group m-4">
+        <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Сегмент попыток</th>
+                  <th scope="col">Количество</th>
+                </tr>
+              </thead>
+            <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Всего попыток</td>
+                  <td>{{ total_attempts }}</td>
+                </tr>
+                <tr class="table-success">
+                  <th scope="row">2</th>
+                  <td>Успешно</td>
+                  <td>{{ success_attempts }}</td>
+                </tr>
+                <tr class="table-danger">
+                  <th scope="row">3</th>
+                  <td>Не успешно</td>
+                  <td>{{ failed_attempts }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </ul>
+{% endblock %}

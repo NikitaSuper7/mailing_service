@@ -7,7 +7,7 @@
 <h2 class="mt-4">Список рассылок</h2>
     <ul class="list-group mb-5">
         {% for mailing in mailings %}
-        {% if user == mailing.owner or perms.MailingService.can_view_mailing %}
+        {% if user == mailing.owner %} <!--or perms.MailingService.can_view_mailing-->
             <li class="list-group-item mr-4">
                 <a href="{% url 'MailingService:mailing_detail' mailing.pk %}">{{ mailing.name | title }}</a> | {{ mailing.message_states }} | {{ mailing.clients}} клиентов
 <!--                <p>Просмотров - {{ article.views_counter }}</p>-->
