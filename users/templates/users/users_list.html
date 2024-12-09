@@ -3,14 +3,16 @@
 {% block title%} Список рассылок {% endblock %}
 
 {% block content %}
-{% include 'MailingService/header_mailings.html' %}
-<h2 class="mt-4">Список рассылок:</h2>
+<!--{% include 'MailingService/header_mailings.html' %}-->
+<h2 class="mt-4">Список пользователей:</h2>
     <ul class="list-group mb-5">
-        {% for mailing in mailings %}
+        {% for current_user in current_users %}
+
             <li class="list-group-item mr-4">
-                <a href="{% url 'MailingService:mailing_detail' mailing.pk %}">{{ mailing.name | title }}</a> | {{ mailing.message_states }} | {{ uniq_clients}} клиентов
+                <a href="{% url 'users:manager_update' current_user.pk %}">{{ current_user.username }}</a> | {{ current_user.email }}
 <!--                <p>Просмотров - {{ article.views_counter }}</p>-->
             </li>
+
         {% endfor %}
 
     </ul>

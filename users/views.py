@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from .forms import CustomUserCreationForm
 from django.core.mail import send_mail
@@ -14,6 +14,7 @@ import secrets
 
 # Импорт емейла:
 from config.settings import EMAIL_HOST_USER
+
 
 # Create your views here.
 
@@ -44,6 +45,7 @@ class RegisterView(CreateView):
         )
         return super().form_valid(form)
 
+
 def email_verification(request, token):
     """Верификация email"""
     user = get_object_or_404(CustomUser, token=token)
@@ -51,13 +53,16 @@ def email_verification(request, token):
     user.save()
     return redirect(reverse('users:login'))
 
+
 class UserDetailView(LoginRequiredMixin, DetailView):
-    """Client detail view"""
+    """User detail view"""
     model = CustomUser
     template_name = 'users/user_detail.html'
     context_object_name = 'current_user'
+
+
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    """Client update view"""
+    """User update view"""
     model = CustomUser
     fields = ['email', 'username', 'phone_number', 'avatar']
     template_name = 'users/user_form.html'
@@ -70,3 +75,32 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
             return self.object
         raise PermissionDenied
 
+
+class UserListView(LoginRequiredMixin, ListView):
+    """Users list view"""
+    model = CustomUser
+    template_name = 'users/users_list.html'
+    context_object_name = 'current_users'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        if user.groups.filter(name="Managers").exists():
+            return CustomUser.objects.exclude(groups__name="Managers")
+
+
+class ManagerUpdateView(LoginRequiredMixin, UpdateView):
+    """Manager update users view"""
+    model = CustomUser
+    fields = ['is_active']
+    template_name = 'users/manager_form.html'
+    success_url = reverse_lazy('users:users_list')
+    context_object_name = 'current_user'
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        user = self.request.user
+        if user.groups.filter(name="Managers").exists():
+            self.object.save()
+            return self.object
+        raise PermissionDenied

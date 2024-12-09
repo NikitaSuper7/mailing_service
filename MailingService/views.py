@@ -46,6 +46,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         client.save()
         return super().form_valid(form)
 
+
 @method_decorator(cache_page(16 * 15), name='dispatch')
 class ClientDetailView(LoginRequiredMixin, DetailView):
     """Client detail view"""
@@ -74,6 +75,7 @@ class ClientDeleteView(LoginRequiredMixin, DeleteView):
     model = Client
     template_name = 'MailingService/client_confirm_delete.html'
     success_url = reverse_lazy('MailingService:client_list')
+
     # context_object_name = 'client'
     def get_object(self, queryset=None):
         """
@@ -112,6 +114,7 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         message.owner = user
         message.save()
         return super().form_valid(form)
+
 
 @method_decorator(cache_page(16 * 15), name='dispatch')
 class MessageDetailView(LoginRequiredMixin, DetailView):
@@ -162,6 +165,36 @@ class MailingListView(LoginRequiredMixin, ListView):
     template_name = 'MailingService/mailings_list.html'
     context_object_name = 'mailings'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mailings = self.model.objects.filter(owner=self.request.user)
+        mailings_ids = [mailing.id for mailing in mailings]
+        user = self.request.user
+        context['is_manager'] = user.groups.filter(name="Managers").exists()
+        context['uniq_clients'] = Client.objects.filter(mailing__id__in=mailings_ids).distinct().count()
+        return context
+
+    def get_queryset(self):
+        queryset = cache.get('mailing_queryset')
+        user = self.request.user
+        # if user.groups.filter(name="Managers").exists():
+        #     return queryset
+        # else:
+        #     queryset = queryset.filter(owner=user)
+        #     # cache.set('mailings_queryset', queryset, 60 * 5)
+        #     return queryset
+        if not queryset:
+            queryset = super().get_queryset()
+            if user.groups.filter(name="Managers").exists():
+                cache.set('mailings_queryset', queryset, 60 * 5)
+                return queryset
+            else:
+                queryset = queryset.filter(owner=user)
+                cache.set('mailings_queryset', queryset, 60 * 5)
+                return queryset
+        return queryset
+
+
 # @method_decorator(cache_page(16 * 5), name='dispatch')
 class MainListView(LoginRequiredMixin, ListView):
     """Mailing list view"""
@@ -173,7 +206,7 @@ class MainListView(LoginRequiredMixin, ListView):
         queryset = cache.get('report_queryset')
         if not queryset:
             queryset = super().get_queryset()
-            cache.set('report_queryset', queryset, 60*5)
+            cache.set('report_queryset', queryset, 60 * 5)
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -182,11 +215,13 @@ class MainListView(LoginRequiredMixin, ListView):
         mailings_ids = [mailing.id for mailing in mailings]
         context['uniq_clients'] = Client.objects.filter(mailing__id__in=mailings_ids).distinct().count()
         context['mailings_total'] = self.model.objects.filter(owner=self.request.user).count()
-        context['mailings_active'] = self.model.objects.filter(owner=self.request.user, message_states="Launched").count()
+        context['mailings_active'] = self.model.objects.filter(owner=self.request.user,
+                                                               message_states="Launched").count()
         context['mailings_completed'] = self.model.objects.filter(owner=self.request.user,
-                                                               message_states="Compleated").count()
+                                                                  message_states="Compleated").count()
         # print(clients)
         return context
+
 
 # @method_decorator(cache_page(16 * 15), name='dispatch')
 class ReportListView(LoginRequiredMixin, ListView):
@@ -214,10 +249,8 @@ class ReportListView(LoginRequiredMixin, ListView):
         return context
 
 
-
-
 class MailingCreateView(LoginRequiredMixin, CreateView):
-    """Mailing create view"""
+    """Mailing create view."""
     model = Mailing
     form_class = MailingForm
     # fields = ['name', 'client', 'massage']
@@ -244,12 +277,14 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
                 if server_response:
                     attemt.state = "Успешно"
                     mailing.message_states = mailing.COMPLETE_STATEMENT
-                    #     mailing.sent_at = datetime.now().date()
+                    mailing.save()
+
                 attemt.save()
 
         except smtplib.SMTPException as exception:
             Attemts.objects.create(mailing=mailing, server_response=exception, state="Ошибка")
             mailing.message_states = mailing.COMPLETE_STATEMENT
+            mailing.save()
 
         return super().form_valid(form)
 
@@ -261,8 +296,11 @@ class MailingDetailView(LoginRequiredMixin, DetailView):
     template_name = 'MailingService/mailing_detail.html'
     context_object_name = 'mailing'
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['is_manager'] = user.groups.filter(name="Managers").exists()
         context['clients'] = self.object.client.count()
         return context
 
@@ -271,16 +309,18 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
     """Mailing update view"""
     model = Mailing
     form_class = MailingForm
-    # fields = fields = ['name', 'client', 'massage']
+    # fields = ['name', 'client', 'massage', 'message_states']
     template_name = 'MailingService/mailing_form.html'
     success_url = reverse_lazy("MailingService:mailings_list")
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
-        if self.request.user == self.object.owner:
+        user = self.request.user
+        if user == self.object.owner:
             self.object.save()
             return self.object
         raise PermissionDenied
+
 
     def form_valid(self, form):
         mailing = form.save()
@@ -307,12 +347,13 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
                 if server_response:
                     attemt.state = "Успешно"
                     mailing.message_states = mailing.COMPLETE_STATEMENT
-                    #     mailing.sent_at = datetime.now().date()
+                    mailing.save()
                 attemt.save()
 
         except smtplib.SMTPException as exception:
             Attemts.objects.create(mailing=mailing, server_response=exception, state="Ошибка")
             mailing.message_states = mailing.COMPLETE_STATEMENT
+            mailing.save()
 
         # if mailing.message_states == mailing.LAUNCH_STATEMENT:
         #     send_mail(
@@ -325,6 +366,22 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
         #     mailing.sent_at = datetime.now().date()
 
         return super().form_valid(form)
+
+class ManagerUpdateView(LoginRequiredMixin, UpdateView):
+    """Manager mailing update view"""
+    model = Mailing
+    # form_class = MailingForm
+    fields = ['message_states']
+    template_name = 'MailingService/manager_form.html'
+    success_url = reverse_lazy("MailingService:mailings_list")
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        user = self.request.user
+        if user.groups.filter(name="Managers").exists():
+            self.object.save()
+            return self.object
+        raise PermissionDenied
 
 
 class MailingDeleteView(LoginRequiredMixin, DeleteView):
@@ -341,5 +398,3 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
         if mailing.owner == user:
             return mailing
         raise PermissionDenied("У вас нет прав на удаление этой рассылки.")
-
-
