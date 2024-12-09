@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, email_verification, UserUpdateView, UserDetailView
+from .views import RegisterView, email_verification, UserUpdateView, UserDetailView, UserListView, ManagerUpdateView
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, \
     PasswordResetConfirmView, PasswordResetCompleteView
 
@@ -35,5 +35,8 @@ urlpatterns = [
     # Для редактирования профиля:
     path("users/<int:pk>", UserDetailView.as_view(), name="user_detail"),
     path("users/update/<int:pk>", UserUpdateView.as_view(), name="user_update"),
+    # Для модераторов:
+    path('users/', UserListView.as_view(), name="users_list"),
+    path("users/manager_update/<int:pk>", ManagerUpdateView.as_view(), name="manager_update"),
 
 ]

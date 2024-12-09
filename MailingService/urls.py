@@ -30,6 +30,9 @@ urlpatterns = [
     path("mailings/main/", views.MainListView.as_view(), name="main_page"),
     path("mailings/report/", views.ReportListView.as_view(), name="report_page"),
 
+    # Для редактирования рассылки, если Менеджер:
+    path("mailings/manager_update/<int:pk>", views.ManagerUpdateView.as_view(), name='manager_update'),
+
 ]
 
 if settings.DEBUG:

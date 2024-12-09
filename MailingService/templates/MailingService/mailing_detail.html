@@ -10,8 +10,10 @@
 <p>Кол-во клиентов: {{ clients }} </p>
 
 {% if user == mailing.owner %}
-<a href="{% url 'MailingService:mailing_update' mailing.pk %}" class="btn btn-secondary">Редактировать</a>
-<a href="{% url 'MailingService:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'MailingService:mailing_update' mailing.pk %}" class="btn btn-secondary">Редактировать</a>
+    <a href="{% url 'MailingService:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
+{% elif is_manager and user != mailing.owner %}
+    <a href="{% url 'MailingService:manager_update' mailing.pk %}" class="btn btn-secondary">Редактировать</a>
 {% endif %}
 <a href="{% url 'MailingService:mailings_list' %}" class="btn btn-primary">Список рассылок</a>
 
